@@ -1,0 +1,23 @@
+sourceSets {
+    acceptanceTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/acceptance-test/java')
+        }
+        resources.srcDir file('src/acceptance-test/resources')
+    }
+}
+
+task acceptanceTest(type: Test) {
+    testClassesDir = sourceSets.acceptanceTest.output.classesDir
+    classpath = sourceSets.acceptanceTest.runtimeClasspath
+    doLast {
+        javaexec {
+        	final String ambiente = "src/acceptance-test/resources/" + System.getenv("AMBIENTE_PIPE");
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.acceptanceTestRuntime + sourceSets.main.output + sourceSets.test.output + sourceSets.acceptanceTest.output
+            args = ['--plugin', 'pretty', '--glue', 'cl.bci.cucumberTest.steps', ambiente]
+        }
+    }
+}s
